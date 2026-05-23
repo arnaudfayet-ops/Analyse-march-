@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analyse Multi-Marchés — 22 Mai 2026 — Capital 500€ · Risque 15€</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07080f;--bg2:#0d0f1e;--bg3:#0a0c18;--border:#1a2040;--border2:#151828;--text:#c8cce0;--text2:#8899bb;--text3:#445566;--accent:#4466ff;--green:#00ff88;--red:#ff4455;--gold:#ffd700;--orange:#ff8866;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:13px;}
+a{color:var(--accent);text-decoration:none;border-bottom:1px dashed rgba(68,102,255,0.4);}
+a:hover{color:#88aaff;}
+.src{display:inline-flex;align-items:center;gap:3px;font-size:8px;color:var(--text3);background:rgba(68,102,255,0.08);border:1px solid rgba(68,102,255,0.2);border-radius:3px;padding:1px 5px;margin-left:5px;vertical-align:middle;text-decoration:none;border-bottom:1px solid rgba(68,102,255,0.2);}
+
+.header{background:linear-gradient(135deg,#0d0f1e,#111425);border-bottom:1px solid var(--border);padding:18px 24px 0;position:sticky;top:0;z-index:100;}
+.h-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;flex-wrap:wrap;gap:10px;}
+.h-label{font-size:9px;color:var(--accent);letter-spacing:3px;margin-bottom:5px;}
+.h-title{font-size:19px;font-weight:700;color:#e8ecff;letter-spacing:1px;}
+.h-sub{font-size:10px;color:var(--text3);margin-top:3px;}
+.cap-badge{padding:6px 14px;border-radius:4px;font-size:11px;font-weight:700;letter-spacing:1px;background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.3);color:#00ff88;margin-bottom:6px;}
+.sentiment{padding:6px 14px;border-radius:4px;font-size:11px;font-weight:700;letter-spacing:1px;background:rgba(255,50,70,0.12);border:1px solid #ff3346;color:#ff5566;}
+
+.ticker-bar{display:flex;gap:0;overflow-x:auto;border-top:1px solid var(--border);padding:10px 0 0;scrollbar-width:none;}
+.ticker-bar::-webkit-scrollbar{display:none;}
+.t-item{min-width:82px;text-align:center;padding:6px 10px 10px;border-right:1px solid var(--border2);flex-shrink:0;}
+.t-name{font-size:8px;color:var(--text3);letter-spacing:1px;margin-bottom:2px;}
+.t-price{font-size:12px;font-weight:600;color:var(--text);}
+.t-chg{font-size:10px;margin-top:1px;}
+.up{color:var(--green);}.dn{color:var(--red);}.neu{color:#888;}
+
+nav{display:flex;background:var(--bg3);border-bottom:1px solid var(--border2);padding:0 24px;overflow-x:auto;}
+.nb{background:none;border:none;border-bottom:2px solid transparent;color:var(--text3);cursor:pointer;padding:12px 18px;font-size:11px;font-family:inherit;font-weight:500;letter-spacing:1px;white-space:nowrap;}
+.nb.active{border-bottom-color:var(--accent);color:var(--accent);font-weight:700;}
+
+.content{padding:24px;max-width:1300px;margin:0 auto;}
+.sec{font-size:9px;color:var(--accent);letter-spacing:2px;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.sec::after{content:'';flex:1;height:1px;background:linear-gradient(to right,rgba(68,102,255,0.3),transparent);}
+.tab{display:none;}.tab.active{display:block;}
+.mb16{margin-bottom:16px;}.mb24{margin-bottom:24px;}
+
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;}
+
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:12px 15px;}
+.card.danger{border-color:#3a1120;background:#100810;}
+.card.safe{border-color:#1a3a2a;background:#081410;}
+.card.hot{border-color:rgba(255,100,50,0.3);background:rgba(255,80,30,0.04);}
+.cl{font-size:8px;color:var(--text3);letter-spacing:1px;margin-bottom:5px;}
+.cv{font-size:13px;font-weight:600;}
+
+.info-box{font-size:11px;padding:10px 15px;background:var(--bg2);border:1px solid var(--border);border-radius:4px;color:var(--text2);line-height:1.6;}
+.warn-box{font-size:11px;padding:10px 15px;background:rgba(255,50,70,0.04);border:1px solid rgba(255,50,70,0.2);border-radius:4px;color:#cc8888;line-height:1.6;}
+.corr{margin-top:12px;padding:14px 18px;background:#0a0d1a;border:1px dashed #223;border-radius:6px;font-size:11px;line-height:1.8;color:#6677aa;}
+
+.ag{display:flex;align-items:center;gap:14px;padding:9px 15px;border-radius:6px;margin-bottom:5px;background:var(--bg2);border:1px solid var(--border);}
+.ag.crit{background:rgba(255,100,50,0.04);border-color:#553322;}
+.ag-date{font-size:10px;font-weight:700;color:var(--accent);min-width:58px;}
+.ag-text{font-size:11px;flex:1;}
+.ag-type{font-size:8px;padding:2px 7px;border-radius:3px;letter-spacing:1px;margin-left:auto;}
+.ag-type.crit{background:rgba(255,80,50,0.18);color:#ff7755;}
+.ag-type.mac{background:rgba(50,100,200,0.18);color:#6699cc;}
+
+.asset-layout{display:grid;grid-template-columns:200px 1fr;gap:18px;}
+.a-list{display:flex;flex-direction:column;gap:3px;max-height:80vh;overflow-y:auto;}
+.a-item{cursor:pointer;padding:9px 13px;border-radius:6px;background:var(--bg2);border:1px solid var(--border2);display:flex;justify-content:space-between;align-items:center;}
+.a-item:hover{border-color:var(--border);background:#101328;}
+.a-item.active{background:#1a1e35;border-color:var(--accent);}
+.a-name{font-size:11px;font-weight:600;color:var(--text);}
+.a-tick{font-size:8px;color:var(--text3);margin-top:1px;}
+.a-right{text-align:right;font-size:9px;}
+
+.trade-block{border-radius:8px;padding:16px 20px;margin-top:12px;}
+.tg{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:10px;}
+.tl{font-size:8px;color:var(--text3);letter-spacing:1px;margin-bottom:3px;}
+.tv{font-size:12px;font-weight:700;}
+
+.sizing-block{background:#0a0d1a;border:1px solid #223;border-radius:6px;padding:14px 18px;margin-top:10px;}
+.sb-title{font-size:9px;color:var(--accent);letter-spacing:1px;margin-bottom:10px;}
+.sb-row{display:flex;justify-content:space-between;font-size:11px;padding:4px 0;border-bottom:1px dashed #1a2040;}
+.sb-row:last-child{border-bottom:none;}
+.sb-label{color:var(--text3);}
+.sb-val{color:var(--text);font-weight:600;}
+
+.cov-block{background:rgba(68,102,255,0.04);border:1px dashed #2244aa;border-radius:6px;padding:14px 18px;margin-top:10px;}
+.cov-title{font-size:9px;color:#6699cc;letter-spacing:1px;margin-bottom:8px;}
+.inv{font-size:11px;color:#994455;padding:7px 11px;background:#1a0a10;border-radius:4px;margin-top:7px;}
+
+.risk-item{background:rgba(255,50,70,0.04);border:1px solid rgba(255,50,70,0.2);border-radius:6px;padding:13px 17px;margin-bottom:9px;}
+.risk-ev{font-size:12px;font-weight:700;color:#ff7788;margin-bottom:5px;}
+.risk-as{font-size:11px;color:#cc7788;margin-bottom:3px;}
+.risk-im{font-size:11px;color:#994455;}
+
+.strat-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:18px 22px;margin-bottom:14px;}
+.sh{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;flex-wrap:wrap;gap:10px;}
+.stit{font-size:14px;font-weight:700;color:var(--text);}
+.stype{font-size:9px;color:var(--text3);margin-top:2px;}
+.srr{padding:5px 14px;background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.25);border-radius:4px;color:var(--gold);font-size:12px;font-weight:700;}
+.sdiv{font-size:11px;color:#667799;margin-bottom:13px;padding:9px 13px;background:var(--bg3);border-radius:4px;line-height:1.6;}
+.jambe-g{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.jambe{border-radius:6px;padding:13px;}
+.jambe.long{background:rgba(0,255,136,0.03);border:1px solid #1a3a2a;}
+.jambe.short{background:rgba(255,68,85,0.03);border:1px solid #3a1a2a;}
+.jl{font-size:8px;letter-spacing:1px;margin-bottom:7px;}
+.jambe.long .jl{color:#336644;}.jambe.short .jl{color:#663344;}
+.ja{font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px;}
+.jm-row{font-size:10px;padding:2px 0;display:flex;justify-content:space-between;}
+.jm-row span:first-child{color:var(--text3);}
+.jm-row span:last-child{color:var(--text);font-weight:600;}
+.trig{font-size:11px;color:#778899;padding:7px 13px;background:var(--bg3);border-radius:4px;border:1px dashed #223344;}
+.totaux{background:#0a0d1a;border:1px solid #2a2040;border-radius:6px;padding:12px 16px;margin-top:10px;}
+.tot-title{font-size:9px;color:var(--gold);letter-spacing:1px;margin-bottom:8px;}
+
+.pod{display:flex;align-items:center;gap:18px;border-radius:8px;padding:15px 18px;margin-bottom:9px;flex-wrap:wrap;}
+.prank{font-size:22px;font-weight:700;min-width:30px;text-align:center;}
+.pname{font-size:13px;font-weight:700;color:var(--text);}
+.preason{font-size:11px;color:#667788;margin-top:3px;}
+
+.dt{width:100%;border-collapse:collapse;font-size:10px;}
+.dt th{padding:8px 8px;text-align:left;font-size:8px;color:var(--text3);letter-spacing:1px;font-weight:400;border-bottom:1px solid var(--border);}
+.dt td{padding:8px 8px;color:#9aaccc;border-bottom:1px solid #0f1228;}
+.dt tr:nth-child(even) td{background:#0a0c18;}
+
+.option-block{background:linear-gradient(135deg,rgba(68,102,255,0.06),rgba(255,215,0,0.04));border:1px solid rgba(255,215,0,0.3);border-radius:8px;padding:18px 22px;margin-bottom:14px;}
+.option-header{font-size:12px;color:var(--gold);letter-spacing:2px;margin-bottom:14px;font-weight:700;}
+.xtb-note{background:rgba(0,255,136,0.05);border:1px dashed rgba(0,255,136,0.3);border-radius:6px;padding:11px 14px;margin-bottom:14px;font-size:10px;color:#88cc99;line-height:1.7;}
+
+.src-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;}
+.src-link{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text3);padding:6px 10px;background:var(--bg2);border:1px solid var(--border2);border-radius:4px;text-decoration:none;border-bottom:none;}
+.src-link:hover{background:#101328;border-color:rgba(68,102,255,0.3);color:#8899cc;}
+.sdot{width:5px;height:5px;border-radius:50%;background:var(--accent);flex-shrink:0;}
+
+@media(max-width:900px){.g4{grid-template-columns:1fr 1fr;}.asset-layout{grid-template-columns:1fr;}.src-grid{grid-template-columns:1fr 1fr;}.tg{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="h-top">
+    <div>
+      <div class="h-label">ANALYSTE MULTI-MARCHÉS // XTB TRADING DESK</div>
+      <div class="h-title">ANALYSE — 22 MAI 2026</div>
+      <div class="h-sub">Capital 500€ · Risque max 15€/trade (3%) · 21 actifs + option ETF · XTB fractionnaire</div>
+    </div>
+    <div style="text-align:right;">
+      <div class="cap-badge">💰 CAPITAL : 500€ · RISQUE MAX : 15€/TRADE (3%)</div>
+      <div class="sentiment">⚠️ TENSIONS IRAN PERSISTANTES · VIX CRUSHED</div>
+    </div>
+  </div>
+  <div class="ticker-bar">
+    <div class="t-item"><div class="t-name">S&P 500</div><div class="t-price">7,432</div><div class="t-chg up">+0.5% sem.</div></div>
+    <div class="t-item"><div class="t-name">NASDAQ</div><div class="t-price">26,165</div><div class="t-chg up">+0.6% sem.</div></div>
+    <div class="t-item"><div class="t-name">CAC 40</div><div class="t-price">8,086</div><div class="t-chg dn">-0.39%</div></div>
+    <div class="t-item"><div class="t-name">QQQ</div><div class="t-price">~$576</div><div class="t-chg up">IV crushed</div></div>
+    <div class="t-item"><div class="t-name">SPY</div><div class="t-price">~$743</div><div class="t-chg up">ATH zone</div></div>
+    <div class="t-item"><div class="t-name">NVDA</div><div class="t-price">$219.45</div><div class="t-chg dn">-3.5% sous high</div></div>
+    <div class="t-item"><div class="t-name">AMD</div><div class="t-price">$193</div><div class="t-chg up">+115% YTD</div></div>
+    <div class="t-item"><div class="t-name">PLTR</div><div class="t-price">$137.41</div><div class="t-chg neu">P/E 152</div></div>
+    <div class="t-item"><div class="t-name">LVMH</div><div class="t-price">~395€</div><div class="t-chg dn">-30% YTD</div></div>
+    <div class="t-item"><div class="t-name">RMS</div><div class="t-price">~1450€</div><div class="t-chg dn">-30% YTD</div></div>
+    <div class="t-item"><div class="t-name">KER</div><div class="t-price">~190€</div><div class="t-chg dn">-20% YTD</div></div>
+    <div class="t-item"><div class="t-name">VIX</div><div class="t-price">17.20</div><div class="t-chg dn">post-NVDA crush</div></div>
+    <div class="t-item"><div class="t-name">VSTOXX</div><div class="t-price">~17.5</div><div class="t-chg neu">détendu</div></div>
+    <div class="t-item"><div class="t-name">WTI</div><div class="t-price">$95</div><div class="t-chg dn">Iran final stages</div></div>
+    <div class="t-item"><div class="t-name">Brent</div><div class="t-price">$102</div><div class="t-chg neu">range</div></div>
+    <div class="t-item"><div class="t-name">XAU</div><div class="t-price">$4,535</div><div class="t-chg neu">range</div></div>
+    <div class="t-item"><div class="t-name">T-Note 10Y</div><div class="t-price">4.55%</div><div class="t-chg dn">-3pb</div></div>
+    <div class="t-item"><div class="t-name">BUND 10Y</div><div class="t-price">3.13%</div><div class="t-chg dn">15Y high</div></div>
+    <div class="t-item"><div class="t-name">BTC</div><div class="t-price">$77,435</div><div class="t-chg dn">sous MM200</div></div>
+    <div class="t-item"><div class="t-name">ETH</div><div class="t-price">$2,180</div><div class="t-chg dn">faible</div></div>
+    <div class="t-item"><div class="t-name">EUR/USD</div><div class="t-price">1.1601</div><div class="t-chg dn">USD fort</div></div>
+  </div>
+</div>
+
+<nav>
+  <button class="nb active" onclick="showTab('macro',this)">🌐 MACRO</button>
+  <button class="nb" onclick="showTab('assets',this)">📊 ACTIFS (21)</button>
+  <button class="nb" onclick="showTab('option',this)">🎯 OPTION ETF ⭐</button>
+  <button class="nb" onclick="showTab('strategies',this)">🔀 STRATÉGIES</button>
+  <button class="nb" onclick="showTab('synthese',this)">🏆 SYNTHÈSE</button>
+  <button class="nb" onclick="showTab('sources',this)">🔗 SOURCES</button>
+</nav>
+
+<div class="content">
+
+<!-- MACRO -->
+<div id="tab-macro" class="tab active">
+
+  <div class="warn-box mb16" style="background:rgba(255,150,50,0.06);border-color:rgba(255,150,50,0.3);color:#ffaa66;">
+    📌 <strong>SITUATION 22 MAI MATIN :</strong> S&P sur 8e semaine de hausse consécutive (record depuis 2023). NVDA a beat ($81.6B) mais action -3.5% sous high $227. FOMC Minutes hawkish — easing bias devrait disparaître. Iran : Trump dit "final stages" MAIS Iran refuse uranium → blocage. Brent ~$102, WTI ~$95. T-Note 10Y retombé à 4.55%.
+  </div>
+
+  <div class="mb24">
+    <div class="sec">▸ BANQUES CENTRALES</div>
+    <div class="g3 mb16">
+      <div class="card"><div class="cl">FED ACTUEL</div><div class="cv" style="color:#00ff88;">3.50%–3.75%</div><div style="font-size:9px;color:#445;margin-top:3px;">Warsh confirmé 14 mai</div></div>
+      <div class="card danger"><div class="cl">PROBA HIKE FED DÉC.</div><div class="cv" style="color:#ff5566;">~44%</div><div style="font-size:9px;color:#554;margin-top:3px;"><a href="https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html" target="_blank">CME FedWatch ✅</a></div></div>
+      <div class="card"><div class="cl">FOMC SUIVANT</div><div class="cv" style="color:#8899cc;">16–17 juin</div><div style="font-size:9px;color:#445;margin-top:3px;">1er meeting Warsh</div></div>
+    </div>
+    <div class="g3 mb16">
+      <div class="card danger"><div class="cl">US T-NOTE 10Y</div><div class="cv" style="color:#ff5566;">4.55%</div><div style="font-size:9px;color:#554;margin-top:3px;">Retombé du high 4.62%</div></div>
+      <div class="card danger"><div class="cl">US 30Y</div><div class="cv" style="color:#ff5566;">5.07%</div><div style="font-size:9px;color:#554;margin-top:3px;">Plus haut depuis 2008</div></div>
+      <div class="card danger"><div class="cl">BUND 10Y</div><div class="cv" style="color:#ff5566;">3.13%</div><div style="font-size:9px;color:#554;margin-top:3px;">15Y high (mai 2011)</div></div>
+    </div>
+    <div class="warn-box">
+      ⚠️ FOMC Minutes (20 mai) : <strong>"prepared to move away from easing bias if inflation remains persistently above 2%"</strong>. Bond market flip de "rate cuts" à "1 hike sur 12 mois" pricé. Mais détente CT sur taux longs cette semaine.
+      <a href="https://finance.yahoo.com/news/live/stock-market-today-dow-sp-500-nasdaq-futures-dip-in-countdown-to-nvidia-earnings-222757467.html" target="_blank" class="src">✅ Yahoo Finance</a>
+    </div>
+  </div>
+
+  <div class="mb24">
+    <div class="sec">▸ INFLATION & DONNÉES</div>
+    <div class="g4 mb16">
+      <div class="card danger"><div class="cl">CPI YoY AVRIL</div><div class="cv" style="color:#ff5566;">+3.8%</div></div>
+      <div class="card danger"><div class="cl">CORE CPI</div><div class="cv" style="color:#ff5566;">+2.8%</div></div>
+      <div class="card danger"><div class="cl">PPI YoY</div><div class="cv" style="color:#ff5566;">+6.0%</div></div>
+      <div class="card"><div class="cl">JOBLESS CLAIMS</div><div class="cv" style="color:#8899cc;">211k</div></div>
+    </div>
+    <div class="info-box">✅ Énergie +17.9% YoY · Pétrole +28.4% — inflation poussée par guerre Iran. <a href="https://www.cnbc.com/2026/05/12/markets-raise-chances-for-a-fed-rate-hike-following-hot-inflation-report.html" target="_blank" class="src">✅ CNBC</a></div>
+  </div>
+
+  <div class="mb24">
+    <div class="sec">▸ RÉGIME DE VOLATILITÉ — VIX CRUSHED</div>
+    <div class="g3">
+      <div class="card safe"><div class="cl">VIX</div><div class="cv" style="color:#00ff88;">17.20</div><div style="font-size:9px;color:#445;margin-top:3px;">IV crush post-NVDA → options bon marché</div></div>
+      <div class="card safe"><div class="cl">VSTOXX</div><div class="cv" style="color:#00ff88;">~17.5</div><div style="font-size:9px;color:#445;margin-top:3px;">Détente après pic semaine</div></div>
+      <div class="card hot"><div class="cl">RÉGIME</div><div class="cv" style="color:#ff8866;">NEUTRAL — BAS PROCHE LOW</div><div style="font-size:9px;color:#554;margin-top:3px;">Setup achat options favorable (IV Rank ~30)</div></div>
+    </div>
+  </div>
+
+  <div class="mb24">
+    <div class="sec">▸ IRAN — TENSIONS RAVIVÉES</div>
+    <div style="display:flex;flex-direction:column;gap:5px;">
+      <div style="font-size:12px;color:#8899bb;padding:8px 15px;border-left:2px solid #ff3346;background:#0d0f1e;">
+        → <strong style="color:#ff7755;">Iran refuse</strong> de transférer son uranium enrichi vers l'extérieur (directive du Guide Suprême) — blocage négociations <a href="https://www.thestreet.com/stock-market-today/stock-market-today-dow-jones-sp-500-nasdaq-updates-may-21-2026" target="_blank" class="src">✅ TheStreet</a>
+      </div>
+      <div style="font-size:12px;color:#8899bb;padding:8px 15px;border-left:2px solid #00ff88;background:#0d0f1e;">
+        → Trump : "final stages" · Marco Rubio évoque progrès · Mais Abu Dhabi National Oil CEO : "Middle East oil flows ne récupéreront pas avant 2027 même en cas d'accord"
+      </div>
+      <div style="font-size:12px;color:#8899bb;padding:8px 15px;border-left:2px solid #2244aa;background:#0d0f1e;">
+        → Iran propose framework Oman péage Hormuz · Trump rejette · WTI a touché des sommets puis retombé sur "final stages" headline
+      </div>
+    </div>
+    <div class="corr">
+      🔗 <strong style="color:#4466ff;">CHAÎNE DE CORRÉLATIONS :</strong><br>
+      <span style="color:#00ff88;">Détente Iran headlines + T-Note retombe à 4.55% → S&P 8e semaine hausse · Dow ATH</span><br>
+      <span style="color:#ff8866;">MAIS Iran uranium refus + Bund 3.13% + Bond vol → setup hawkish encore actif sous-jacent</span><br>
+      <span style="color:#ffd700;">VIX 17.20 = IV crush → options put SPY/QQQ accessibles à bon prix pour couvrir PCE 28 mai + NFP 5 juin</span>
+    </div>
+  </div>
+
+  <div class="mb24">
+    <div class="sec">▸ AGENDA 7 JOURS</div>
+    <div class="ag mac"><div class="ag-date">22 MAI</div><div class="ag-text">Univ. Michigan Inflation Expectations Mai final</div><div class="ag-type mac">MACRO</div></div>
+    <div class="ag crit"><div class="ag-date">28 MAI</div><div class="ag-text"><strong style="color:#ff8866;">⭐ PCE Inflation avril — jauge préférée Fed — décisif FOMC juin</strong></div><div class="ag-type crit">CRITIQUE</div></div>
+    <div class="ag mac"><div class="ag-date">28-30 MAI</div><div class="ag-text">PIB Q1 final · Jobless Claims · Lagarde discours</div><div class="ag-type mac">MACRO</div></div>
+    <div class="ag crit"><div class="ag-date">5 JUIN</div><div class="ag-text">NFP Mai — emploi US</div><div class="ag-type crit">CRITIQUE</div></div>
+    <div class="ag crit"><div class="ag-date">16-17 JUIN</div><div class="ag-text">FOMC Warsh — décision hike vs hold</div><div class="ag-type crit">CRITIQUE</div></div>
+  </div>
+
+</div>
+
+<!-- ACTIFS -->
+<div id="tab-assets" class="tab">
+  <div class="asset-layout">
+    <div class="a-list" id="assetList"></div>
+    <div id="assetDetail">
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:400px;color:#223355;text-align:center;">
+        <div style="font-size:48px;margin-bottom:14px;">◈</div>
+        <div style="font-size:13px;">Sélectionner un actif (21)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OPTION ETF -->
+<div id="tab-option" class="tab">
+  <div class="sec">▸ 🎯 RECOMMANDATION OPTION ETF — UNE SEULE PAR ANALYSE</div>
+
+  <div class="xtb-note">
+    ⚙️ <strong>SPÉCIFICITÉ XTB — OPTIONS FRACTIONNAIRES :</strong> XTB permet le trading par fractions de lot (min 0.01 lot = 1 part du sous-jacent). La prime cotée correspond à 1 part. Sizing : nombre de lots = risque max ÷ (prime par 0.01 lot × cours EUR/USD), arrondi par tranches de 0.01. Cette spécificité rend les options ETF accessibles avec un capital de 500€.
+  </div>
+
+  <div class="option-block">
+    <div class="option-header">⭐ SETUP : LONG PUT SPY — Couverture macro hawkish + IV crushed</div>
+
+    <div style="font-size:11px;color:#aaaaff;margin-bottom:14px;line-height:1.7;">
+      VIX à 17.20 = IV crush post-NVDA → options bon marché. Setup asymétrique : PCE 28 mai + NFP 5 juin + FOMC 17 juin = 3 catalyseurs hawkish concentrés sur 4 semaines. SPY à $743 = zone ATH avec FOMC Minutes hawkish. S&P 8e semaine hausse consécutive = mean reversion attendue. SPY préféré à QQQ car NDX porté par NVDA = setup plus propre sur S&P large.
+    </div>
+
+    <div class="g3 mb16">
+      <div class="card"><div class="cl">ETF</div><div class="cv" style="color:#aaaaff;">SPY</div><div style="font-size:9px;color:#445;margin-top:3px;">Prix spot ~$743</div></div>
+      <div class="card"><div class="cl">BIAIS</div><div class="cv" style="color:#00ff88;">LONG</div><div style="font-size:9px;color:#445;margin-top:3px;">Achat de l'option</div></div>
+      <div class="card"><div class="cl">TYPE</div><div class="cv" style="color:#ff5566;">PUT</div><div style="font-size:9px;color:#445;margin-top:3px;">Baisse anticipée</div></div>
+    </div>
+
+    <div class="sizing-block">
+      <div class="sb-title">DÉTAIL DE L'OPTION — SIZING XTB FRACTIONNAIRE</div>
+      <div class="sb-row"><span class="sb-label">Strike</span><span class="sb-val">$730 (~1.7% OTM)</span></div>
+      <div class="sb-row"><span class="sb-label">Échéance</span><span class="sb-val">19 juin 2026 (4 semaines)</span></div>
+      <div class="sb-row"><span class="sb-label">Justification strike</span><span class="sb-val">Sous MM20 D1 SPY + premier support technique</span></div>
+      <div class="sb-row"><span class="sb-label">Justification échéance</span><span class="sb-val">Couvre PCE 28 mai + NFP 5 juin + FOMC 17 juin</span></div>
+      <div class="sb-row"><span class="sb-label">Prime cotée (ask par part)</span><span class="sb-val">~$5.20 USD</span></div>
+      <div class="sb-row"><span class="sb-label">Prime par 0.01 lot XTB</span><span class="sb-val">~$5.20 = <strong style="color:#00ff88;">4.48€</strong> (au cours 1.1601)</span></div>
+      <div class="sb-row"><span class="sb-label">Delta estimé</span><span class="sb-val">~-0.35 (OTM modérément)</span></div>
+      <div class="sb-row"><span class="sb-label">Nombre de lots XTB</span><span class="sb-val" style="color:#ffd700;">0.03 lot (15€ ÷ 4.48€ = 3.34 → 0.03)</span></div>
+      <div class="sb-row"><span class="sb-label">Coût total prime</span><span class="sb-val">0.03 × $5.20 × 100 = $15.60 = <strong style="color:#00ff88;">13.45€</strong></span></div>
+      <div class="sb-row"><span class="sb-label">Risque max (perte totale prime)</span><span class="sb-val" style="color:#ff5566;">13.45€ (sous risque max 15€) ✅</span></div>
+    </div>
+
+    <div class="sizing-block" style="margin-top:14px;">
+      <div class="sb-title">GESTION DU TRADE</div>
+      <div class="sb-row"><span class="sb-label">Stop loss (sur prime)</span><span class="sb-val">Clôturer si prime perd 50% → prix ~$2.60 par part → perte ~6.70€</span></div>
+      <div class="sb-row"><span class="sb-label">Take profit (sur prime)</span><span class="sb-val">Clôturer si prime double (+100%) → prix ~$10.40 → gain ~13.45€</span></div>
+      <div class="sb-row"><span class="sb-label">SL alternatif (sur sous-jacent)</span><span class="sb-val">Clôturer si SPY casse $755 (ATH récent)</span></div>
+      <div class="sb-row"><span class="sb-label">TP alternatif (sur sous-jacent)</span><span class="sb-val">Clôturer si SPY atteint $725</span></div>
+      <div class="sb-row"><span class="sb-label">R/R option</span><span class="sb-val" style="color:#ffd700;">2.0:1 (sur prime double vs SL -50%)</span></div>
+      <div class="sb-row"><span class="sb-label">Theta decay quotidien</span><span class="sb-val">~$0.08/jour (~1.5% prime/jour à l'approche échéance)</span></div>
+      <div class="sb-row"><span class="sb-label">Breakeven à échéance</span><span class="sb-val">SPY $730 − $5.20 = <strong>$724.80</strong> (besoin -2.4% SPY)</span></div>
+      <div class="sb-row"><span class="sb-label">IV Rank estimé</span><span class="sb-val" style="color:#00ff88;">~30% (low — favorable pour acheter options)</span></div>
+    </div>
+
+    <div class="cov-block">
+      <div class="cov-title">🔄 COUVERTURE EUR/USD</div>
+      <div style="font-size:11px;color:#8899bb;line-height:1.7;">
+        Notionnel prime payée : 13.45€ — <strong>très inférieur au seuil 500€</strong> → <strong>aucune couverture EUR/USD nécessaire</strong>.<br>
+        Note : le DELTA total de la position (0.35 × 3 parts × $743 ≈ $780 d'exposition synthétique) reste également sous le seuil 500€ converti.
+      </div>
+    </div>
+
+    <div class="inv" style="margin-top:14px;">
+      ❌ INVALIDATION : SPY casse $755 (ATH récent) en clôture + Iran trêve formelle annoncée → clôturer immédiatement, ne pas attendre theta.
+    </div>
+
+    <div style="font-size:11px;color:#88cc99;margin-top:14px;padding:11px 14px;background:rgba(0,255,136,0.04);border:1px dashed rgba(0,255,136,0.2);border-radius:6px;line-height:1.7;">
+      ✅ <strong>RÉSUMÉ :</strong> Long put SPY $730 19 juin sur 0.03 lot XTB pour 13.45€ de prime. Asymétrie favorable : IV crushed + 3 catalyseurs baissiers sur 4 semaines. Gain potentiel 13.45€ si SPY -2.5% / Perte max 13.45€ si SPY reste >$724.80. CONVICTION ⭐⭐⭐.
+    </div>
+  </div>
+
+</div>
+
+<!-- STRATÉGIES -->
+<div id="tab-strategies" class="tab">
+  <div class="sec">▸ STRATÉGIES AVANCÉES — CAPITAL 500€ · RISQUE 15€</div>
+
+  <div class="strat-card">
+    <div class="sh">
+      <div><div class="stit">Long Brent / Short LSGasoil — Spread crack inversé</div><div class="stype">Pair trade énergie — spread brut vs distillé tendu</div></div>
+      <div class="srr">R/R combiné 2.0:1</div>
+    </div>
+    <div class="sdiv">📊 Iran refuse uranium → tension brut maintenue, mais spread distillé/brut historiquement élevé = mean reversion attendue. Brent direct beneficiary disruption, LSGasoil overshooted en spike. Pair anti-corrélé en mean reversion.</div>
+    <div class="jambe-g">
+      <div class="jambe long">
+        <div class="jl">JAMBE 1 — LONG</div>
+        <div class="ja">Brent (BRN)</div>
+        <div class="jm-row"><span>Entrée / SL / TP</span><span>$102 / $96 / $114</span></div>
+        <div class="jm-row"><span>Taille</span><span>1 baril CFD</span></div>
+        <div class="jm-row"><span>Valeur contrat</span><span>$102 (88€)</span></div>
+        <div class="jm-row"><span>Marge (x10)</span><span>9€</span></div>
+        <div class="jm-row"><span>Risque réel</span><span>~6€</span></div>
+      </div>
+      <div class="jambe short">
+        <div class="jl">JAMBE 2 — SHORT</div>
+        <div class="ja">LSGasoil (ULS)</div>
+        <div class="jm-row"><span>Entrée / SL / TP</span><span>$950/t / $1,000/t / $850/t</span></div>
+        <div class="jm-row"><span>Taille</span><span>0.1 lot CFD</span></div>
+        <div class="jm-row"><span>Valeur contrat</span><span>~$950 (819€)</span></div>
+        <div class="jm-row"><span>Marge (x10)</span><span>82€</span></div>
+        <div class="jm-row"><span>Risque réel</span><span>~9€</span></div>
+      </div>
+    </div>
+    <div class="totaux">
+      <div class="tot-title">TOTAUX STRATÉGIE</div>
+      <div class="jm-row"><span>Marge totale</span><span style="color:#ffd700;">91€</span></div>
+      <div class="jm-row"><span>Exposition totale</span><span>~907€</span></div>
+      <div class="jm-row"><span>Risque max combiné</span><span style="color:#00ff88;">~15€</span></div>
+      <div class="jm-row"><span>R/R combiné</span><span style="color:#00ff88;">2.0:1</span></div>
+      <div class="jm-row"><span>Corrélation Brent-LSGasoil</span><span>+0.7 (corrélation positive — pair spread)</span></div>
+    </div>
+    <div class="cov-block">
+      <div class="cov-title">🔄 COUVERTURE EUR/USD — STRATÉGIE</div>
+      <div style="font-size:11px;color:#8899bb;line-height:1.7;">
+        Deux jambes USD → notionnel net = LONG Brent 88€ − SHORT LSGasoil 819€ = <strong>-731€ exposition SHORT nette USD</strong><br>
+        731€ > seuil 500€ → <strong>SHORT EUR/USD 0.01 lot</strong> (couvre 1000€)<br>
+        Cours : 1.1601 ✅ · Marge couverture : ~33€
+      </div>
+    </div>
+    <div class="trig" style="margin-top:10px;">⚡ DÉCLENCHEUR : Spread distillé/brut > 30% du brut + Iran négociations bloquées</div>
+  </div>
+
+  <div class="strat-card">
+    <div class="sh">
+      <div><div class="stit">Long Gold / Short Bitcoin — Stagflation hedge classique</div><div class="stype">Rotation refuge — or bid macro vs BTC pénalisé taux</div></div>
+      <div class="srr">R/R combiné 2.0:1</div>
+    </div>
+    <div class="sdiv">📊 Or hedge inflation structurel (CPI 3.8%, PPI 6%). BTC sous MM200 $82,228 — macro ceiling confirmé après 5 rejets. T-Note 10Y à 4.55% pénalise BTC. PCE 28 mai catalyseur potentiel des deux côtés.</div>
+    <div class="jambe-g">
+      <div class="jambe long">
+        <div class="jl">JAMBE 1 — LONG</div>
+        <div class="ja">Or XAU/USD</div>
+        <div class="jm-row"><span>Entrée / SL / TP</span><span>$4,535 / $4,420 / $4,750</span></div>
+        <div class="jm-row"><span>Taille</span><span>0.09 oz</span></div>
+        <div class="jm-row"><span>Valeur contrat</span><span>$408 (351€)</span></div>
+        <div class="jm-row"><span>Marge (x20)</span><span>17.55€</span></div>
+        <div class="jm-row"><span>Risque réel</span><span>~9€</span></div>
+      </div>
+      <div class="jambe short">
+        <div class="jl">JAMBE 2 — SHORT</div>
+        <div class="ja">Bitcoin BTC/USD</div>
+        <div class="jm-row"><span>Entrée / SL / TP</span><span>$77,435 / $81,500 / $68,500</span></div>
+        <div class="jm-row"><span>Taille</span><span>0.0015 BTC</span></div>
+        <div class="jm-row"><span>Valeur contrat</span><span>$116 (100€)</span></div>
+        <div class="jm-row"><span>Marge (x2)</span><span>50€</span></div>
+        <div class="jm-row"><span>Risque réel</span><span>~6€</span></div>
+      </div>
+    </div>
+    <div class="totaux">
+      <div class="tot-title">TOTAUX STRATÉGIE</div>
+      <div class="jm-row"><span>Marge totale</span><span style="color:#ffd700;">67.55€</span></div>
+      <div class="jm-row"><span>Exposition totale</span><span>~451€</span></div>
+      <div class="jm-row"><span>Risque max combiné</span><span style="color:#00ff88;">~15€</span></div>
+      <div class="jm-row"><span>R/R combiné</span><span style="color:#00ff88;">2.0:1</span></div>
+      <div class="jm-row"><span>Corrélation Or-BTC</span><span>~-0.4 (anti-corrélés en hawkish)</span></div>
+    </div>
+    <div class="cov-block">
+      <div class="cov-title">🔄 COUVERTURE EUR/USD — STRATÉGIE</div>
+      <div style="font-size:11px;color:#8899bb;line-height:1.7;">
+        Deux jambes USD → notionnel net = LONG Or 351€ − SHORT BTC 100€ = <strong>+251€ exposition LONG nette USD</strong><br>
+        251€ < seuil 500€ → <strong>aucune couverture EUR/USD nécessaire</strong>
+      </div>
+    </div>
+    <div class="trig" style="margin-top:10px;">⚡ DÉCLENCHEUR : T-Note > 4.5% maintenu + BTC ne casse pas $82k</div>
+  </div>
+
+  <div class="strat-card">
+    <div class="sh">
+      <div><div class="stit">Long VSTOXX / Réduction long actions EU — Couverture event</div><div class="stype">Couverture event risk PCE/NFP/FOMC concentrés sur 4 semaines</div></div>
+      <div class="srr">R/R 2.6:1</div>
+    </div>
+    <div class="sdiv">📊 VSTOXX à 17.5 post-NVDA = IV crushed. 3 catalyseurs hawkish dans 4 semaines (PCE 28 mai, NFP 5 juin, FOMC 17 juin). Setup mean-reversion + event-driven. Asymétrie LONG vol favorable.</div>
+    <div class="jambe-g">
+      <div class="jambe long">
+        <div class="jl">JAMBE 1 — LONG</div>
+        <div class="ja">VSTOXX (V2TX)</div>
+        <div class="jm-row"><span>Entrée / SL / TP</span><span>17.5 / 15.50 / 22</span></div>
+        <div class="jm-row"><span>Taille</span><span>7-8 unités CFD</span></div>
+        <div class="jm-row"><span>Valeur contrat</span><span>~130€</span></div>
+        <div class="jm-row"><span>Marge (x6)</span><span>~22€</span></div>
+        <div class="jm-row"><span>Risque réel</span><span>15€</span></div>
+      </div>
+      <div class="jambe short">
+        <div class="jl">JAMBE 2 — RÉDUCTION</div>
+        <div class="ja">Pas de short — couverture pure</div>
+        <div class="jm-row"><span>Action</span><span>Réduire expo long actions EU</span></div>
+      </div>
+    </div>
+    <div class="cov-block">
+      <div class="cov-title">🔄 COUVERTURE EUR/USD</div>
+      <div style="font-size:11px;color:#8899bb;">Aucune — VSTOXX est libellé en EUR</div>
+    </div>
+    <div class="trig" style="margin-top:10px;">⚡ DÉCLENCHEUR : VSTOXX > 18 confirmé + PCE 28 mai approche</div>
+  </div>
+</div>
+
+<!-- SYNTHÈSE -->
+<div id="tab-synthese" class="tab">
+
+  <div class="sec">▸ 🏆 PODIUM — CAPITAL 500€ · RISQUE 15€</div>
+
+  <div class="pod" style="background:rgba(255,215,0,0.05);border:1px solid rgba(255,215,0,0.3);border-radius:8px;">
+    <div class="prank" style="color:#ffd700;">⭐</div>
+    <div style="flex:1">
+      <div class="pname">OPTION SPY PUT $730 19 juin <a href="https://www.barchart.com/etfs-funds/quotes/QQQ/options" target="_blank" class="src">✅ Barchart</a></div>
+      <div class="preason">IV crushed + 3 catalyseurs hawkish concentrés · Sizing XTB 0.03 lot = 13.45€ · R/R 2.0:1 · Pas de couverture EUR/USD nécessaire (notionnel < 500€)</div>
+    </div>
+    <div style="text-align:right;"><div style="color:#ff5566;font-weight:700;">▼ LONG PUT ⭐⭐⭐</div><div style="font-size:11px;color:#8899cc;margin-top:3px;">R/R 2.0:1 · Coût 13.45€</div></div>
+  </div>
+
+  <div class="pod" style="background:rgba(0,200,255,0.04);border:1px solid rgba(0,200,255,0.2);border-radius:8px;">
+    <div class="prank" style="color:#88ccff;">#1</div>
+    <div style="flex:1">
+      <div class="pname">Brent (BRN) <a href="https://tradingeconomics.com/commodity/brent-crude-oil" target="_blank" class="src">✅ TradingEcon</a></div>
+      <div class="preason">Iran uranium refus durable · Abu Dhabi : oil flows pas avant 2027 · Pas de couverture EUR/USD (notionnel 88€ < 500€)</div>
+    </div>
+    <div style="text-align:right;"><div style="color:#00ff88;font-weight:700;">▲ LONG ⭐⭐⭐</div><div style="font-size:11px;color:#8899cc;margin-top:3px;">R/R 2.0:1 · Marge 9€</div></div>
+  </div>
+
+  <div class="pod" style="background:rgba(180,180,180,0.02);border:1px solid rgba(180,180,180,0.12);border-radius:8px;">
+    <div class="prank" style="color:#aaa;">#2</div>
+    <div style="flex:1">
+      <div class="pname">VSTOXX <a href="https://www.investing.com/indices/stoxx-50-volatility-vstoxx-eur" target="_blank" class="src">✅ Investing</a></div>
+      <div class="preason">IV crashed à 17.5 — setup mean-reversion + PCE 28 mai + NFP 5 juin + FOMC 17 juin = 3 catalyseurs hawkish</div>
+    </div>
+    <div style="text-align:right;"><div style="color:#00ff88;font-weight:700;">▲ LONG ⭐⭐</div><div style="font-size:11px;color:#8899cc;margin-top:3px;">R/R 2.6:1 · Marge 22€</div></div>
+  </div>
+
+  <div class="pod" style="background:rgba(200,120,50,0.03);border:1px solid rgba(200,120,50,0.15);border-radius:8px;margin-bottom:24px;">
+    <div class="prank" style="color:#cc7733;">#3</div>
+    <div style="flex:1">
+      <div class="pname">SHORT Kering (KER.PA) <a href="https://placement.meilleurtaux.com/bourse/actualites/2026-mai/luxe-au-cac-40-lvmh-hermes-kering-en-baisse.html" target="_blank" class="src">✅ Meilleurtaux</a></div>
+      <div class="preason">Le moins touché du luxe (-20% YTD vs -30%) = encore downside · Gucci restructuration · Luca de Meo CEO</div>
+    </div>
+    <div style="text-align:right;"><div style="color:#ff4455;font-weight:700;">▼ SHORT ⭐⭐</div><div style="font-size:11px;color:#8899cc;margin-top:3px;">R/R 2.0:1 · Marge 19€</div></div>
+  </div>
+
+  <div class="sec">▸ ⚠️ CARTE DES RISQUES</div>
+  <div class="risk-item">
+    <div class="risk-ev">⚠️ Trêve Iran formelle confirmée cette semaine (Trump "final stages")</div>
+    <div class="risk-as">Brent -10/15%, WTI -10/15%, Or -3/5%, SPY +1.5%, EUR/USD +1.5%</div>
+    <div class="risk-im">→ INVALIDATION Brent LONG + Option SPY PUT (catalyseur baissier disparait)</div>
+  </div>
+  <div class="risk-item">
+    <div class="risk-ev">⚠️ PCE Inflation 28 mai > consensus (probable vu CPI/PPI)</div>
+    <div class="risk-as">T-Note > 4.8%, Bund > 3.3% → SPY -2/3%, Or -3%, BTC -8%, growth -5%</div>
+    <div class="risk-im">→ Option SPY PUT rentabilise · VSTOXX explose · LONG Or sous pression CT</div>
+  </div>
+  <div class="risk-item">
+    <div class="risk-ev">⚠️ NFP 5 juin > 250k + chômage < 4%</div>
+    <div class="risk-as">Hike Fed juin pricé > 70% → T-Note > 5%, USD massive bid, SPY -3%</div>
+    <div class="risk-im">→ Option SPY PUT et VSTOXX rentabilisent · Brent neutralisé</div>
+  </div>
+
+  <div class="sec" style="margin-top:24px;">▸ 📊 TABLEAU DE BORD — CAPITAL 500€ · RISQUE 15€</div>
+  <div style="overflow-x:auto;">
+    <table class="dt">
+      <thead><tr>
+        <th>ACTIF</th><th>BIAIS</th><th>ENTRÉE</th><th>SL</th><th>TP</th><th>TAILLE</th><th>VAL.CONTRAT</th><th>MARGE</th><th>LEVIER</th><th>RISQUE</th><th>COUV.EURUSD</th><th>STATUT</th>
+      </tr></thead>
+      <tbody>
+        <tr><td style="font-weight:600;color:#c8cce0;">Brent</td><td style="color:#00ff88;font-weight:700;">▲ LONG ⭐⭐⭐</td><td>$102</td><td style="color:#ff5566;">$96</td><td style="color:#00ff88;">$114</td><td>1 baril</td><td>88€</td><td style="color:#ffd700;">9€</td><td>x10</td><td>~6€</td><td style="color:#445566;">— (< 500€)</td><td style="color:#00ff88;">ACTIF</td></tr>
+        <tr><td style="font-weight:600;color:#c8cce0;">VSTOXX</td><td style="color:#00ff88;font-weight:700;">▲ LONG ⭐⭐</td><td>17.5</td><td style="color:#ff5566;">15.50</td><td style="color:#00ff88;">22</td><td>7 CFD</td><td>123€</td><td style="color:#ffd700;">22€</td><td>x6</td><td>~14€</td><td style="color:#445566;">— EUR</td><td style="color:#888;">EN ATTENTE</td></tr>
+        <tr><td style="font-weight:600;color:#c8cce0;">Kering</td><td style="color:#ff4455;font-weight:700;">▼ SHORT ⭐⭐</td><td>190€</td><td style="color:#ff5566;">200€</td><td style="color:#00ff88;">170€</td><td>1.5 CFD</td><td>285€</td><td style="color:#ffd700;">57€</td><td>x5</td><td>15€</td><td style="color:#445566;">— EUR</td><td style="color:#888;">EN ATTENTE</td></tr>
+        <tr><td style="font-weight:600;color:#c8cce0;">Or XAU/USD</td><td style="color:#aaddff;font-weight:700;">▲ LONG cond.</td><td>$4,535</td><td style="color:#ff5566;">$4,420</td><td style="color:#00ff88;">$4,750</td><td>0.09 oz</td><td>351€</td><td style="color:#ffd700;">17.55€</td><td>x20</td><td>~9€</td><td style="color:#445566;">— (< 500€)</td><td style="color:#888;">CONDITIONNEL</td></tr>
+        <tr style="background:rgba(255,215,0,0.04);"><td style="font-weight:600;color:#ffd700;">OPTION SPY PUT</td><td style="color:#ff5566;font-weight:700;">▼ LONG PUT ⭐⭐⭐</td><td>$730 strike</td><td style="color:#ff5566;">prime -50%</td><td style="color:#00ff88;">prime +100%</td><td>0.03 lot</td><td>~$15.60</td><td style="color:#ffd700;">13.45€ prime</td><td>—</td><td>13.45€</td><td style="color:#445566;">— (< 500€)</td><td style="color:#ffd700;font-weight:700;">⭐ RECOMMANDÉ</td></tr>
+        <tr style="border-top:2px solid #2a2040;background:#0d0e20;">
+          <td colspan="7" style="color:#445566;font-size:10px;">Marge totale si TOP 3 + option (Brent + VSTOXX + Kering + Option)</td>
+          <td style="color:#ffd700;font-weight:700;font-size:12px;">101.45€</td>
+          <td colspan="4" style="color:#445566;font-size:10px;">Risque cumulé : ~48€ — Capital dispo : 398.55€</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div style="margin-top:9px;font-size:10px;color:#334455;padding:9px 13px;background:#0a0c18;border-radius:4px;">
+    ⚠️ Règles respectées : 3 positions max + 1 option · Règle corrélation (Brent seule expo pétrole — pas de WTI/LSGasoil en doublon) · Volatilité neutral · Pre-event 24h OK · <strong>Seuil 500€ couverture EUR/USD appliqué — aucune couverture sur les positions individuelles car notionnels < 500€</strong>
+  </div>
+
+</div>
+
+<!-- SOURCES -->
+<div id="tab-sources" class="tab">
+  <div class="sec">▸ 🔗 SOURCES VÉRIFIÉES — 22 MAI 2026</div>
+
+  <div class="mb16">
+    <div style="font-size:9px;color:#4466ff;letter-spacing:2px;margin-bottom:8px;">INDICES & MARCHÉS</div>
+    <div class="src-grid">
+      <a href="https://www.cnbc.com/2026/05/21/stock-market-today-live-updates.html" target="_blank" class="src-link"><span class="sdot"></span>CNBC — Markets 21 mai</a>
+      <a href="https://finance.yahoo.com/news/live/stock-market-today-dow-sp-500-nasdaq-futures-climb-as-markets-await-update-on-us-iran-peace-talks-223454027.html" target="_blank" class="src-link"><span class="sdot"></span>Yahoo — Live updates</a>
+      <a href="https://www.thestreet.com/stock-market-today/stock-market-today-dow-jones-sp-500-nasdaq-updates-may-21-2026" target="_blank" class="src-link"><span class="sdot"></span>TheStreet — 21 mai</a>
+      <a href="https://finance.yahoo.com/quote/%5EVIX/" target="_blank" class="src-link"><span class="sdot"></span>Yahoo — VIX</a>
+    </div>
+  </div>
+
+  <div class="mb16">
+    <div style="font-size:9px;color:#4466ff;letter-spacing:2px;margin-bottom:8px;">OPTIONS QQQ/SPY</div>
+    <div class="src-grid">
+      <a href="https://www.barchart.com/etfs-funds/quotes/QQQ/options" target="_blank" class="src-link"><span class="sdot"></span>Barchart — QQQ Options</a>
+      <a href="https://www.barchart.com/etfs-funds/quotes/QQQ/volatility-charts" target="_blank" class="src-link"><span class="sdot"></span>Barchart — IV QQQ</a>
+      <a href="https://optioncharts.io/options/QQQ" target="_blank" class="src-link"><span class="sdot"></span>OptionCharts — QQQ</a>
+      <a href="https://finance.yahoo.com/quote/QQQ/options/" target="_blank" class="src-link"><span class="sdot"></span>Yahoo — QQQ Chain</a>
+    </div>
+  </div>
+
+  <div class="mb16">
+    <div style="font-size:9px;color:#4466ff;letter-spacing:2px;margin-bottom:8px;">TECH / SEMICOS / ACTIONS US</div>
+    <div class="src-grid">
+      <a href="https://robinhood.com/us/en/stocks/NVDA/" target="_blank" class="src-link"><span class="sdot"></span>Robinhood — NVDA</a>
+      <a href="https://robinhood.com/us/en/stocks/PLTR/" target="_blank" class="src-link"><span class="sdot"></span>Robinhood — PLTR</a>
+      <a href="https://www.investing.com/equities/palantir-technologies-inc" target="_blank" class="src-link"><span class="sdot"></span>Investing — PLTR</a>
+      <a href="https://www.fool.com/investing/2026/05/13/meet-the-ai-stock-crushing-palantir-nvidia-and-alp/" target="_blank" class="src-link"><span class="sdot"></span>Motley Fool — AMD</a>
+    </div>
+  </div>
+
+  <div class="mb16">
+    <div style="font-size:9px;color:#4466ff;letter-spacing:2px;margin-bottom:8px;">LUXE FRANÇAIS</div>
+    <div class="src-grid">
+      <a href="https://placement.meilleurtaux.com/bourse/actualites/2026-mai/luxe-au-cac-40-lvmh-hermes-kering-en-baisse.html" target="_blank" class="src-link"><span class="sdot"></span>Meilleurtaux — Luxe -30%</a>
+      <a href="https://www.moneyvox.fr/bourse/actualites/108822/cac-40-la-correction-du-luxe-touche-t-elle-a-sa-fin-pour-lvmh-hermes-et-kering" target="_blank" class="src-link"><span class="sdot"></span>MoneyVox — Correction luxe</a>
+      <a href="https://www.boursorama.com/cours/1rPMC/" target="_blank" class="src-link"><span class="sdot"></span>Boursorama — LVMH</a>
+    </div>
+  </div>
+
+  <div class="mb16">
+    <div style="font-size:9px;color:#4466ff;letter-spacing:2px;margin-bottom:8px;">MACRO / TAUX / FOMC</div>
+    <div class="src-grid">
+      <a href="https://tradingeconomics.com/united-states/government-bond-yield" target="_blank" class="src-link"><span class="sdot"></span>TradingEcon — T-Note 10Y</a>
+      <a href="https://www.investing.com/rates-bonds/u.s.-10-year-bond-yield" target="_blank" class="src-link"><span class="sdot"></span>Investing — T-Note</a>
+      <a href="https://tradingeconomics.com/germany/government-bond-yield" target="_blank" class="src-link"><span class="sdot"></span>TradingEcon — Bund</a>
+      <a href="https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html" target="_blank" class="src-link"><span class="sdot"></span>CME FedWatch</a>
+    </div>
+  </div>
+
+  <div class="mb16">
+    <div style="font-size:9px;color:#4466ff;letter-spacing:2px;margin-bottom:8px;">PÉTROLE / OR / CRYPTO</div>
+    <div class="src-grid">
+      <a href="https://tradingeconomics.com/commodity/brent-crude-oil" target="_blank" class="src-link"><span class="sdot"></span>TradingEcon — Brent</a>
+      <a href="https://www.investing.com/commodities/brent-oil" target="_blank" class="src-link"><span class="sdot"></span>Investing — Brent</a>
+      <a href="https://www.oilpriceapi.com/oil-prices-today" target="_blank" class="src-link"><span class="sdot"></span>OilPriceAPI</a>
+      <a href="https://www.litefinance.org/blog/analysts-opinions/gold-price-prediction-forecast/daily-and-weekly/" target="_blank" class="src-link"><span class="sdot"></span>LiteFinance — Or</a>
+      <a href="https://www.coindesk.com/markets/2026/05/15/the-two-and-ten-year-treasury-yields-hit-a-12-month-high-bitcoin-is-still-stuck-below-its-200-day-average" target="_blank" class="src-link"><span class="sdot"></span>CoinDesk — BTC</a>
+    </div>
+  </div>
+
+  <div class="info-box" style="margin-top:14px;font-size:10px;">
+    ✅ Toutes données vérifiées 22 mai 2026 matin. Cours en mouvement permanent — vérifier avant exécution. Pas un conseil en investissement. Capital 500€ · Risque 15€/trade · XTB · Seuil couverture EUR/USD : 500€.
+  </div>
+</div>
+
+</div>
+
+<div style="padding:14px 24px;border-top:1px solid #0f1228;background:#07080f;font-size:9px;color:#334455;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;">
+  <div>Sources : CNBC · Yahoo · Investing · TheStreet · TradingEconomics · CME FedWatch · Robinhood · Boursorama · Barchart · OptionCharts · Meilleurtaux · CoinDesk · 22 mai 2026</div>
+  <div>✅ Capital 500€ · Risque 15€/trade (3%) · XTB · Options XTB fractionnaires (min 0.01 lot)</div>
+</div>
+
+<script>
+const assets = [
+  {n:"S&P 500",t:"SPX",p:"7,432 (+0.5% sem.)",ch:"8e semaine hausse — record depuis 2023",src:"Yahoo",su:"https://finance.yahoo.com/quote/%5EGSPC/",
+    b:"PASSER",c:"⭐⭐",h:"Post-PCE",
+    ctx:"S&P sur 8e semaine consécutive de hausse (record depuis 2023). FOMC Minutes hawkish + T-Note 4.55%. ATH zone vulnérable post-PCE 28 mai. Setup option PUT SPY plus actionnable.",
+    up:["Iran final stages headline","T-Note retombe","Dow ATH"],
+    dn:["FOMC Minutes hawkish","PCE 28 mai","Mean reversion 8 sem."],
+    d1:"Range haut ATH",w1:"Haussière 8 sem.",atr:"~75 pts",
+    s:["7,350","7,200","7,030"],r:["7,500","7,517 ATH"],
+    st:"Range haut",ti:"Post-PCE 28 mai",
+    raison:"R/R faible aux ATH avec PCE binaire. Préférer LONG PUT SPY pour exposer la baisse."
+  },
+  {n:"Nasdaq 100",t:"NDX",p:"26,165 (+0.6% sem.)",ch:"NVDA porté",src:"Yahoo",su:"https://finance.yahoo.com/quote/%5EGSPC/",
+    b:"PASSER",c:"⭐⭐",h:"Post-PCE",
+    ctx:"NDX porté par NVDA et AMD. Valuations stretched. AI demand intact mais event-by-event.",
+    up:["AI demand intact","Capex hyperscalers","NVDA beat"],
+    dn:["Valuations stretched","T-Note 4.55%","FOMC hawkish"],
+    d1:"Consolidation",w1:"Haussière",atr:"~300 pts",
+    s:["25,800","25,500"],r:["26,500","27,000"],
+    st:"Consolidation haut",ti:"Post-PCE",
+    raison:"R/R aux ATH non favorable. Option PUT SPY préférable."
+  },
+  {n:"CAC 40",t:"FCHI",p:"8,086 (-0.39%)",ch:"Luxe pèse",src:"Yahoo",su:"https://finance.yahoo.com/quote/%5EFCHI/",
+    b:"PASSER",c:"⭐",h:"CT",
+    ctx:"CAC tiraillé : composantes en direction opposée. Bund 3.13% comprime. Préférer Kering SHORT.",
+    up:["TotalEnergies si Brent","Mean reversion luxe"],
+    dn:["Luxe -30% YTD","Bund yields hauts","BCE hawkish"],
+    d1:"Range",w1:"Neutre",atr:"~60 pts",
+    s:["8,000","7,800","7,600"],r:["8,200","8,300"],
+    st:"Range",ti:"Trader composantes",
+    raison:"Préférer trader Kering en direct."
+  },
+  {n:"NVIDIA",t:"NVDA",p:"$219.45 (-3.5% sous high)",ch:"Beat $81.6B mais action faible",src:"Robinhood",su:"https://robinhood.com/us/en/stocks/NVDA/",
+    b:"PASSER",c:"⭐⭐",h:"Swing 1-2 sem.",
+    ctx:"NVDA Q1 FY27 beat ($81.6B vs $79.2B) MAIS action -3.5% sous high $227 sur supply constraints + geopol Chine. PE 34.22. Insider selling Form 4 récent.",
+    up:["Beat propre","Vera CPU $20B 2026","Hyperscalers capex"],
+    dn:["Supply Chine","Pricée la perfection","Action faible post-beat"],
+    d1:"Post-earn baisse",w1:"Haussière",atr:"~$7",
+    s:["$217","$210","$200"],r:["$227","$236.54 ATH"],
+    st:"Consolidation post-event",ti:"Attendre stabilisation",
+    raison:"Réaction négative malgré beat = fatigue. Attendre tendance ré-établie."
+  },
+  {n:"AMD",t:"AMD",p:"$193 (+115% YTD)",ch:"Meilleur AI stock 2026",src:"Motley Fool",su:"https://www.fool.com/investing/2026/05/13/meet-the-ai-stock-crushing-palantir-nvidia-and-alp/",
+    b:"PASSER",c:"⭐⭐",h:"Swing",
+    ctx:"AMD +115% YTD = meilleur AI stock. CEO Lisa Su double CPU forecast 35% annualized 2030. MI450 GPUs Meta/OpenAI H2 2026.",
+    up:["MI450 launch H2","EPYC Venice","CPU growth 35%"],
+    dn:["Pricée la perfection","Mean reversion","Volatilité"],
+    d1:"ATH zone",w1:"Très haussière",atr:"~$5",
+    s:["$180","$170","$155"],r:["$200","$220"],
+    st:"ATH",ti:"Attendre pullback $180",
+    raison:"Trop pricée. Pullback $180-185 nécessaire pour R/R favorable."
+  },
+  {n:"Broadcom",t:"AVGO",p:"~+2% rebond",ch:"AI ecosystem",src:"Motley Fool",su:"https://www.fool.com/investing/2026/05/04/nvda-pltr-avgo-send-wall-street-46-billion-warning/",
+    b:"PASSER",c:"⭐⭐",h:"Swing",
+    ctx:"AVGO bénéficie ecosystem NVDA. Hyperscaler capex 2026 supportif. Insider net sellers (Motley Fool warning).",
+    up:["Hyperscaler capex","VMware synergies","AI ASIC"],
+    dn:["Insider selling","Valuation stretched","Pas catalyseur immédiat"],
+    d1:"Haussière",w1:"Haussière",atr:"~$15",
+    s:["$1,500","$1,400"],r:["$1,700","$1,800"],
+    st:"Continuation",ti:"Pullback nécessaire",
+    raison:"Préférer AMD ou option PUT SPY pour expo macro."
+  },
+  {n:"Palantir",t:"PLTR",p:"$137.41 (+0.19%)",ch:"PE 152 bubble · -24% YTD",src:"Investing",su:"https://www.investing.com/equities/palantir-technologies-inc",
+    b:"PASSER",c:"⭐",h:"CT",
+    ctx:"PLTR cible analystes $183.73 (+33.71% upside). Q1 rev $1.63B +85% YoY. US rev +104%. PE 152 = bubble. -24% YTD. Range $135-138 actuellement.",
+    up:["Cible analystes +33.71%","US govt rev +84%","Karp guidance 71% growth"],
+    dn:["PE 152 bubble","Insider selling Form 4","Volume baisse"],
+    d1:"Range",w1:"Baissière YTD",atr:"~$5",
+    s:["$130","$120","$118.93 52w low"],r:["$145","$160","$207 ATH"],
+    st:"Range bas fourchette",ti:"Attendre cassure $145",
+    raison:"PE 152 bubble + insider selling. Préférer setup plus propre."
+  },
+  {n:"LVMH",t:"MC.PA",p:"~395€ (-30% YTD)",ch:"Demande Chine fragile",src:"Meilleurtaux",su:"https://placement.meilleurtaux.com/bourse/actualites/2026-mai/luxe-au-cac-40-lvmh-hermes-kering-en-baisse.html",
+    b:"PASSER",c:"⭐",h:"Swing",
+    ctx:"LVMH -30% YTD. Demande Chine fragile. Trafic Golfe affecté Iran. Arnault renforcement >50% (signal LT). Possible entrée Armani.",
+    up:["RSI survente","Arnault renforcement","Possible Armani"],
+    dn:["Chine fragile","Trafic Golfe","Stagflation"],
+    d1:"Baissière",w1:"Baissière LT",atr:"~12€",
+    s:["380€","350€","320€"],r:["420€","450€"],
+    st:"Tendance baissière",ti:"Préférer Kering",
+    raison:"Kering meilleur SHORT (downside encore disponible)."
+  },
+  {n:"Hermès",t:"RMS.PA",p:"~1450€ (-30% YTD)",ch:"Mono-marque ultra-luxe",src:"Meilleurtaux",su:"https://placement.meilleurtaux.com/bourse/actualites/2026-mai/luxe-au-cac-40-lvmh-hermes-kering-en-baisse.html",
+    b:"PASSER",c:"⭐",h:"CT",
+    ctx:"Hermès -30% YTD. Valuation encore élevée historiquement. Marges intactes mais ventes ralentissent.",
+    up:["Marges élevées","Famille Hermès stable","Mean reversion"],
+    dn:["Valuation","Demand destruction","Trafic Golfe"],
+    d1:"Baissière",w1:"Baissière",atr:"~40€",
+    s:["1,400€","1,300€"],r:["1,550€","1,700€"],
+    st:"Tendance baissière",ti:"Attendre stabilisation",
+    raison:"Préférer Kering (plus de downside)."
+  },
+  {n:"Kering",t:"KER.PA",p:"~190€ (-20% YTD)",ch:"Le moins touché du luxe",src:"Meilleurtaux",su:"https://placement.meilleurtaux.com/bourse/actualites/2026-mai/luxe-au-cac-40-lvmh-hermes-kering-en-baisse.html",
+    b:"SHORT",c:"⭐⭐",h:"Swing 2-4 sem.",
+    ctx:"Kering -20% YTD = encore downside vs LVMH/Hermès -30%. CA 2025 14.67B€. Net income 0.07B€ (quasi nul). Gucci restructuration. Luca de Meo CEO depuis nomination récente.",
+    up:["Luca de Meo nomination","Mean reversion","Famille Pinault 42.23%"],
+    dn:["Encore downside vs concurrents","Restructuration coûteuse","Stagflation"],
+    d1:"Baissière",w1:"Baissière",atr:"~6€",
+    s:["180€","170€","155€"],r:["200€","220€"],
+    st:"Tendance baissière",ti:"SHORT entrée immédiate",
+    e:"190€",sl:"200€",tp:"170€",rr:"2.0:1",
+    atrC:"SL 10€ = 1.7× ATR ✅",
+    ta:"15€ ÷ 10€/action = 1.5 actions → 1.5 CFD sur XTB",
+    vc:"285€ (1.5 CFD à 190€)",
+    m:"57€ (levier x5)",
+    pe:"15€",
+    g:"30€",
+    inv:"Kering >200€ clôture hebdo + rebound luxe confirmé",
+    cov:null,
+    covReason:"Actif EUR — pas d'exposition USD"
+  },
+  {n:"VIX",t:"VIX",p:"17.20 (-1.38%)",ch:"IV crush post-NVDA",src:"Yahoo",su:"https://www.cboe.com/tradable-products/vix/",
+    b:"PASSER (préférer VSTOXX ou option SPY)",c:"⭐",h:"CT",
+    ctx:"VIX 17.20 — bas post-NVDA. IV Rank ~30% = setup achat options favorable. Maintenant trop bas pour LONG VIX direct propre. Préférer option SPY PUT ou VSTOXX.",
+    up:["PCE 28 mai catalyseur","FOMC juin","Iran rebound"],
+    dn:["Détente Iran","Marché complaisant"],
+    d1:"Bas",w1:"Range bas",atr:"~1.3",
+    s:["15","17"],r:["20","25","30+"],
+    st:"Bas — setup vol potentiel",ti:"Préférer option SPY PUT",
+    raison:"Option SPY PUT plus efficace pour exposition baisse + payment direct."
+  },
+  {n:"VSTOXX",t:"V2TX",p:"~17.5",ch:"Détente post-NVDA",src:"Investing",su:"https://www.investing.com/indices/stoxx-50-volatility-vstoxx-eur",
+    b:"LONG conditionnel",c:"⭐⭐",h:"CT tactique",
+    ctx:"VSTOXX à 17.5 — IV crushed. PCE 28 mai + NFP 5 juin + FOMC 17 juin = 3 catalyseurs concentrés. Setup mean-reversion + event-driven.",
+    up:["PCE > consensus","NFP 5 juin","FOMC hawkish"],
+    dn:["Trêve Iran","Tendance détente"],
+    d1:"Bas",w1:"Range",atr:"~1.4",
+    s:["15.50","16.50"],r:["19","21","25"],
+    st:"Mean reversion bottom",ti:"Entrée immédiate ou cassure 18",
+    e:"17.5",sl:"15.50",tp:"22",rr:"2.25:1",
+    atrC:"SL 2 = 1.4× ATR ✅",
+    ta:"15€ ÷ 2€/unité = 7.5 unités → 7-8 CFD",
+    vc:"~130€",
+    m:"~22€ (levier x6)",
+    pe:"~14€",
+    g:"~32€",
+    inv:"VSTOXX clôture hebdo <15 + Iran trêve formelle",
+    cov:null,
+    covReason:"VSTOXX libellé en EUR — pas d'exposition USD"
+  },
+  {n:"WTI",t:"CL",p:"$95",ch:"-5% sur Iran final stages",src:"Yahoo",su:"https://www.investing.com/commodities/crude-oil",
+    b:"PASSER (corrélé Brent)",c:"⭐⭐",h:"Swing",
+    ctx:"WTI $95 après Trump 'final stages'. Dynamique identique Brent. Règle corrélation : Brent expo déjà ouverte.",
+    up:["Identique Brent"],
+    dn:["Identique Brent"],
+    d1:"Range",w1:"Haussière",atr:"~$3.5",
+    s:["$93","$90","$85"],r:["$100","$105"],
+    st:"Range",ti:"PASSER",
+    raison:"Brent déjà ouvert = expo pétrole. Règle corrélation."
+  },
+  {n:"Brent",t:"BRN",p:"$102",ch:"Iran uranium refus soutient",src:"TradingEconomics",su:"https://tradingeconomics.com/commodity/brent-crude-oil",
+    b:"LONG",c:"⭐⭐⭐",h:"Swing 1-3 sem.",
+    ctx:"Brent $102. Iran uranium refus → tension maintenue. Abu Dhabi National Oil CEO : Middle East oil flows pas avant 2027 même en cas d'accord. Hormuz closure 'most severe supply disruption on record'.",
+    up:["Iran uranium refus durable","Abu Dhabi : flows pas avant 2027","Hormuz closure record"],
+    dn:["Trump 'final stages'","Supertankers Hormuz","Trêve possible CT"],
+    d1:"Range",w1:"Haussière",atr:"~$4",
+    s:["$98","$95","$90"],r:["$108","$115","$120"],
+    st:"Continuation haussière sous-jacente",ti:"Entrée immédiate",
+    e:"$102",sl:"$96",tp:"$114",rr:"2.0:1",
+    atrC:"SL $6 = 1.5× ATR ✅",
+    ta:"15€ ÷ ($6 × 0.862) = 15€ ÷ 5.17€ = 2.9 barils → 1 baril sécurité (réduit pour Iran vol)",
+    vc:"$102 (88€)",
+    m:"9€ (levier x10)",
+    pe:"~6€",
+    g:"~12€",
+    inv:"Trêve Iran formelle + Brent <$96 clôture",
+    cov:null,
+    covReason:"Notionnel USD 88€ < seuil 500€ — aucune couverture EUR/USD"
+  },
+  {n:"LSGasoil ULS",t:"ULS",p:"~$950/t (tendu)",ch:"Spread distillé/brut élevé",src:"FXEmpire",su:"https://www.fxempire.com/",
+    b:"SHORT (jambe pair Brent/Gasoil)",c:"⭐⭐",h:"Swing",
+    ctx:"LSGasoil tendu Iran disrupt. Spread distillé/brut historiquement élevé = mean reversion. Setup pair-trade avec Brent LONG.",
+    up:["Hiver demande","Iran disrupt","Heating oil baseline"],
+    dn:["Spread distillé/brut overshooted","Trêve Iran","Récession demand"],
+    d1:"Range haut",w1:"Haussière",atr:"~$30",
+    s:["$900","$850","$800"],r:["$1,000","$1,050","$1,100"],
+    st:"Mean reversion attendue",ti:"SHORT dans pair-trade avec Brent",
+    e:"$950/t",sl:"$1,000",tp:"$850",rr:"2.0:1",
+    atrC:"SL $50 = 1.7× ATR ✅",
+    ta:"15€ ÷ ($50 × 0.862) = 0.35 → 0.1 lot CFD min XTB",
+    vc:"$950 (819€)",
+    m:"82€ (levier x10)",
+    pe:"~9€",
+    g:"~17€",
+    inv:"LSGasoil >$1,050 + spread normalize (Iran trêve)",
+    cov:"SHORT EUR/USD 0.01 lot",
+    covRate:"1.1601",
+    covMarge:"~33€",
+    covReason:"Notionnel USD 819€ > seuil 500€ → SHORT EUR/USD 0.01 lot (couvre jusqu'à 1000€)"
+  },
+  {n:"Gasoline RBOB",t:"RB",p:"~$2.50/gal (estimé)",ch:"Corrélé Brent",src:"OilPriceAPI",su:"https://www.oilpriceapi.com/oil-prices-today",
+    b:"PASSER (corrélé Brent)",c:"⭐",h:"CT",
+    ctx:"RBOB corrélé Brent. Demande estivale arrive. Volatilité Iran-dépendante. Règle corrélation.",
+    up:["Driving season","Refinery margins","Iran disrupt"],
+    dn:["Trêve Iran","Récession","SPR"],
+    d1:"Range",w1:"Haussière",atr:"variable",
+    s:["$2.30","$2.10"],r:["$2.70","$3.00"],
+    st:"Range",ti:"PASSER",
+    raison:"Corrélé Brent. Une seule expo énergie = Brent direct."
+  },
+  {n:"Or XAU/USD",t:"XAUUSD",p:"$4,535",ch:"Range $4,441-$4,576",src:"LiteFinance",su:"https://www.litefinance.org/blog/analysts-opinions/gold-price-prediction-forecast/daily-and-weekly/",
+    b:"LONG conditionnel",c:"⭐⭐",h:"Swing 1-2 sem.",
+    ctx:"Or $4,535. Range projeté $4,441-$4,576 pour 25 mai. Structurellement bullish (CPI 3.8%, PPI 6%) mais yields hauts pénalisent CT. PCE 28 mai catalyseur clé. CME : 97.4% proba taux inchangés juin.",
+    up:["PCE > consensus","Inflation structurelle","Central banks accumulation"],
+    dn:["T-Note 4.55% taux réels positifs","DXY fort","Trêve Iran"],
+    d1:"Range",w1:"Haussière LT",atr:"~$70",
+    s:["$4,420","$4,250","$4,100"],r:["$4,600","$4,750","$4,900"],
+    st:"Range — attente catalyseur",ti:"Conditionnel post-PCE 28 mai",
+    e:"$4,535",sl:"$4,420",tp:"$4,750",rr:"1.9:1",
+    atrC:"SL $115 = 1.6× ATR ✅",
+    ta:"15€ ÷ ($115 × 0.862) = 15€ ÷ 99€ = 0.15 → 0.09 oz sécurité",
+    vc:"$408 (351€)",
+    m:"17.55€ (levier x20)",
+    pe:"~9€",
+    g:"~17€",
+    inv:"T-Note >5% confirmé + Iran trêve simultanés",
+    cov:null,
+    covReason:"Notionnel USD 351€ < seuil 500€ — aucune couverture EUR/USD"
+  },
+  {n:"T-Note 10Y",t:"ZN",p:"4.55% yield",ch:"-3pb sur détente",src:"CNBC",su:"https://www.cnbc.com/2026/05/21/stock-market-today-live-updates.html",
+    b:"PASSER (macro indicateur)",c:"⭐",h:"Macro",
+    ctx:"T-Note 10Y à 4.55% — retombé du high 4.62%. FOMC Minutes hawkish soutient yields. PCE 28 mai prochain test. Range 4.4-4.8 attendu.",
+    up:["BCE + Fed hawkish","Inflation persistante","Hike juin 44%"],
+    dn:["Trêve Iran déflationniste","Récession demand","Fed dovish"],
+    d1:"Range",w1:"Haussière yield",atr:"~0.05%",
+    s:["4.40%","4.20%"],r:["4.80%","5.00%"],
+    st:"Range",ti:"Trader effet sur option SPY PUT",
+    raison:"Trader l'effet via Option SPY PUT (catalyseur intégré dans la thèse)."
+  },
+  {n:"BUND 10Y",t:"BUND",p:"3.13% yield — 15Y HIGH",ch:"Plus haut depuis mai 2011",src:"TradingEconomics",su:"https://tradingeconomics.com/germany/government-bond-yield",
+    b:"PASSER (déjà très haut)",c:"⭐",h:"Macro",
+    ctx:"Bund 3.13% = 15Y high. BCE proba hike juin 90%. Mouvement principal déjà fait.",
+    up:["BCE hike juin","Inflation EU"],
+    dn:["BCE pause","Récession EU"],
+    d1:"Yield haut",w1:"Tendance forte",atr:"~0.05%",
+    s:["3.00%","2.80%"],r:["3.30%","3.50%"],
+    st:"Continuation R/R limité",ti:"Trader effet Kering",
+    raison:"Mouvement déjà fait. Trader via SHORT Kering (luxe sensible aux taux EU)."
+  },
+  {n:"Bitcoin",t:"BTC",p:"$77,435 (-0.58%)",ch:"Sous MM200 $82,228",src:"CoinDesk",su:"https://www.coindesk.com/markets/2026/05/15/the-two-and-ten-year-treasury-yields-hit-a-12-month-high-bitcoin-is-still-stuck-below-its-200-day-average",
+    b:"SHORT (jambe pair Or/BTC)",c:"⭐⭐",h:"Swing",
+    ctx:"BTC sous MM200 — macro ceiling confirmé. 5 rejets $82k ce mois. CME FedWatch 44% hike. ETF outflows. Clarity Act passe Senate mais pas suffisant.",
+    up:["MSTR accumulation","Halving cycle","Clarity Act"],
+    dn:["Macro ceiling Fed hike 44%","ETF outflows","5 rejets $82k"],
+    d1:"Baissière sous MM200",w1:"Range bas",atr:"~$2,800",
+    s:["$76,000","$72,000","$65,000"],r:["$80,000","$82,228 MM200","$85,000"],
+    st:"Range bas",ti:"SHORT entrée immédiate (jambe pair)",
+    e:"$77,435",sl:"$81,500",tp:"$68,500",rr:"2.2:1",
+    atrC:"SL $4,065 = 1.5× ATR ✅",
+    ta:"15€ ÷ ($4,065 × 0.862) = 0.0043 → 0.0015 BTC sécurité",
+    vc:"$116 (100€)",
+    m:"50€ (levier x2)",
+    pe:"~6€",
+    g:"~13€",
+    inv:"BTC casse $82,228 MM200 + 2 clôtures + ETF inflows",
+    cov:null,
+    covReason:"Notionnel USD 100€ < seuil 500€ — aucune couverture EUR/USD"
+  },
+  {n:"Ethereum",t:"ETH",p:"$2,180",ch:"Sous MM50 et MM200",src:"Investing",su:"https://www.investing.com/",
+    b:"PASSER",c:"⭐",h:"CT",
+    ctx:"ETH sous MM50 et MM200. Treasury yields rising pressure. JPMorgan bearish vs BTC.",
+    up:["Upgrade Glamsterdam","Treasury buying","ETF flows"],
+    dn:["JPMorgan bearish","Sous double MM","Beta risk-off"],
+    d1:"Baissière",w1:"Baissière LT",atr:"~$70",
+    s:["$2,000","$1,800"],r:["$2,336","$2,450"],
+    st:"Tendance baissière",ti:"PASSER",
+    raison:"Trop baissier sans catalyseur. Préférer SHORT BTC."
+  }
+];
+
+function bC(b){if(b.includes("LONG"))return"#00ff88";if(b.includes("SHORT"))return"#ff4455";return"#888";}
+function bS(b){if(b.includes("LONG"))return"▲";if(b.includes("SHORT"))return"▼";return"—";}
+
+const listEl=document.getElementById("assetList");
+assets.forEach((a,i)=>{
+  const div=document.createElement("div");
+  div.className="a-item";
+  div.id="ai"+i;
+  div.innerHTML=`<div><div class="a-name">${a.n}</div><div class="a-tick">${a.t}</div></div><div class="a-right" style="color:${bC(a.b)};">${bS(a.b)}<br><span style="font-size:9px;">${a.c}</span></div>`;
+  div.onclick=()=>renderAsset(i);
+  listEl.appendChild(div);
+});
+
+function renderAsset(i){
+  document.querySelectorAll(".a-item").forEach(el=>el.classList.remove("active"));
+  document.getElementById("ai"+i).classList.add("active");
+  const a=assets[i];
+  const c=bC(a.b);
+  let trade="";
+  if(a.e){
+    trade=`<div class="trade-block" style="background:#0a0d1a;border:1px solid ${c}33;margin-top:12px;">
+      <div class="sec" style="color:${c};margin-bottom:12px;">▸ RECOMMANDATION — RISQUE 15€</div>
+      <div class="tg">
+        <div><div class="tl">ENTRÉE</div><div class="tv" style="color:#8899cc;">${a.e}</div></div>
+        <div><div class="tl">STOP LOSS</div><div class="tv" style="color:#ff5566;">${a.sl}</div></div>
+        <div><div class="tl">TAKE PROFIT</div><div class="tv" style="color:#00ff88;">${a.tp}</div></div>
+        <div><div class="tl">R/R</div><div class="tv" style="color:#ffd700;">${a.rr}</div></div>
+      </div>
+      <div style="font-size:10px;color:#669;padding:6px 10px;background:#0a0d1a;border-radius:4px;margin-bottom:8px;">ATR (14) D1 : ${a.atr} · ${a.atrC}</div>
+      <div class="sizing-block">
+        <div class="sb-title">SIZING DÉTAILLÉ</div>
+        <div class="sb-row"><span class="sb-label">Taille</span><span class="sb-val">${a.ta}</span></div>
+        <div class="sb-row"><span class="sb-label">Valeur contrat</span><span class="sb-val">${a.vc}</span></div>
+        <div class="sb-row"><span class="sb-label">Marge requise XTB</span><span class="sb-val" style="color:#ffd700;">${a.m}</span></div>
+        <div class="sb-row"><span class="sb-label">Perte max SL</span><span class="sb-val" style="color:#ff5566;">${a.pe}</span></div>
+        <div class="sb-row"><span class="sb-label">Gain potentiel TP</span><span class="sb-val" style="color:#00ff88;">${a.g}</span></div>
+      </div>
+      <div class="inv">❌ INVALIDATION : ${a.inv}</div>
+      <div class="cov-block">
+        <div class="cov-title">🔄 COUVERTURE EUR/USD</div>
+        <div style="font-size:11px;color:#8899bb;line-height:1.7;">
+          <strong>${a.covReason}</strong>
+          ${a.cov?'<br>Cours utilisé : '+a.covRate+' · Marge couverture : '+a.covMarge:''}
+        </div>
+      </div>
+    </div>`;
+  } else {
+    trade=`<div style="padding:11px 15px;background:#0d0f1e;border:1px solid #2a2040;border-radius:6px;margin-top:12px;"><div style="font-size:8px;color:#554455;letter-spacing:1px;margin-bottom:5px;">— RAISON DU PASS —</div><div style="font-size:11px;color:#667788;line-height:1.6;">${a.raison}</div></div>`;
+  }
+
+  document.getElementById("assetDetail").innerHTML=`
+    <div style="background:#0d0f1e;border:1px solid #1a2040;border-radius:8px;padding:15px 18px;margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;">
+        <div>
+          <div style="font-size:18px;font-weight:700;color:#e8ecff;">${a.n} <span style="color:#445566;font-size:12px;">${a.t}</span></div>
+          <div style="font-size:20px;font-weight:700;color:${c};margin-top:3px;">${a.p}</div>
+          <div style="font-size:11px;color:#445566;margin-top:2px;">${a.ch} — <a href="${a.su}" target="_blank">✅ ${a.src}</a></div>
+        </div>
+        <div style="text-align:right;">
+          <div style="padding:7px 14px;border-radius:6px;background:${c}22;border:1px solid ${c}55;color:${c};font-size:11px;font-weight:700;letter-spacing:1px;">${a.b}</div>
+          <div style="margin-top:6px;font-size:15px;color:#ffd700;">${a.c}</div>
+          <div style="font-size:10px;color:#445566;margin-top:2px;">${a.h}</div>
+        </div>
+      </div>
+    </div>
+    <div class="mb16">
+      <div class="sec">▸ FONDAMENTAUX</div>
+      <div style="font-size:12px;color:#8899bb;line-height:1.7;margin-bottom:11px;padding:11px 15px;background:#0d0f1e;border-radius:6px;">${a.ctx}</div>
+      <div class="g2">
+        <div style="background:#0a100e;border:1px solid #1a3a2a;border-radius:6px;padding:11px 13px;">
+          <div style="font-size:9px;color:#336644;letter-spacing:1px;margin-bottom:7px;">▲ CATALYSEURS HAUSSIERS</div>
+          ${a.up.map((c2,j)=>`<div style="font-size:11px;color:#668877;padding:3px 0;border-bottom:1px solid #1a2a20;">${j+1}. ${c2}</div>`).join("")}
+        </div>
+        <div style="background:#100a0e;border:1px solid #3a1a2a;border-radius:6px;padding:11px 13px;">
+          <div style="font-size:9px;color:#663344;letter-spacing:1px;margin-bottom:7px;">▼ CATALYSEURS BAISSIERS</div>
+          ${a.dn.map((c2,j)=>`<div style="font-size:11px;color:#886677;padding:3px 0;border-bottom:1px solid #2a1a20;">${j+1}. ${c2}</div>`).join("")}
+        </div>
+      </div>
+    </div>
+    <div class="mb16">
+      <div class="sec">▸ TECHNIQUE</div>
+      <div class="g3 mb16">
+        <div class="card"><div class="cl">TENDANCE D1 / W1</div><div style="font-size:11px;color:#8899bb;">${a.d1} / ${a.w1}</div></div>
+        <div class="card"><div class="cl">ATR (14) D1</div><div style="font-size:11px;color:#ff8866;">${a.atr}</div></div>
+        <div class="card"><div class="cl">STRUCTURE / TIMING</div><div style="font-size:11px;color:#8899bb;">${a.st} / ${a.ti}</div></div>
+      </div>
+      <div class="g2">
+        <div style="background:#0a100e;border:1px solid #1a3020;border-radius:6px;padding:11px;">
+          <div style="font-size:9px;color:#336644;margin-bottom:5px;">SUPPORTS</div>
+          ${a.s.map(s=>`<div style="font-size:11px;color:#557766;padding:2px 0;">▶ ${s}</div>`).join("")}
+        </div>
+        <div style="background:#100a0e;border:1px solid #301a20;border-radius:6px;padding:11px;">
+          <div style="font-size:9px;color:#664433;margin-bottom:5px;">RÉSISTANCES</div>
+          ${a.r.map(r=>`<div style="font-size:11px;color:#775566;padding:2px 0;">◀ ${r}</div>`).join("")}
+        </div>
+      </div>
+    </div>
+    ${trade}
+  `;
+}
+
+function showTab(id,btn){
+  document.querySelectorAll(".tab").forEach(el=>el.classList.remove("active"));
+  document.querySelectorAll(".nb").forEach(el=>el.classList.remove("active"));
+  document.getElementById("tab-"+id).classList.add("active");
+  btn.classList.add("active");
+}
+</script>
+</body>
+</html>
